@@ -1,0 +1,39 @@
+---
+  driver:
+    name: vagrant
+    winrm:
+      username: vagrant
+      password: vagrant
+
+  transport:
+    name: winrm
+
+  provisioner:
+    name: ansible_playbook
+    hosts: all
+    roles_path: spec/ansible/windows-hardening
+    galaxy_ignore_certs: true
+  
+  verifier:
+    name: inspec
+    #load_plugins: true
+    inspec_tests:
+      - path: ./
+    #input_files:
+    #  - inputs.yml
+    reporter:
+      - cli
+      - json:%{suite}-test-result.json
+  
+  platforms:
+    - name: windows-2019
+      driver:
+        box: tas50/windows_2019
+
+  suites:
+    - name: hardened
+      provisioner:
+        playbook: spec/ansible/windows-hardening/hardening-playbook.yml
+    - name: vanilla
+      provisioner:
+        playbook: spec/ansible/windows-hardening/vanilla-playbook.yml
